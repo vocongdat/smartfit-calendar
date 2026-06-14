@@ -4,33 +4,48 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 
 interface IProps extends IActionCalendar {
   data: ICalendar[];
+  selectedDate: string;
   onChangeWorkout: (params: {
     idWorkout: string;
-    idDaySource: string;
-    idDayDestination: string;
+    dateSource: string;
+    dateDestination: string;
     indexDestination: number;
-    indexSource: number;
   }) => void;
 }
 
-function WeekWorkout({ data, onChangeWorkout, ...props }: IProps) {
+function WeekWorkout({
+  data,
+  selectedDate,
+  onChangeWorkout,
+  ...actions
+}: IProps) {
   function onDragEnd(result: DropResult) {
     const { source, destination, draggableId } = result;
     if (!destination) return;
+    if (
+      source.droppableId === destination.droppableId &&
+      source.index === destination.index
+    ) {
+      return;
+    }
     onChangeWorkout({
-      idDayDestination: destination.droppableId,
       idWorkout: draggableId,
-      idDaySource: source.droppableId,
+      dateSource: source.droppableId,
+      dateDestination: destination.droppableId,
       indexDestination: destination.index,
-      indexSource: source.index,
     });
   }
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex h-[calc(var(--app-height)-(var(--app-padding-phone)*2))] gap-2.5 overflow-hidden pr-[var(--app-padding-phone)] md:h-[calc(100vh-(var(--app-padding)*2))] md:pr-[var(--app-padding)]">
-        {data.map(workout => (
-          <DayWorkout key={workout.id} {...workout} {...props} />
+      <div className="stagger flex min-h-0 flex-1 gap-3 overflow-x-auto overflow-y-hidden pb-1 md:snap-x md:snap-mandatory">
+        {data.map(day => (
+          <DayWorkout
+            key={day.id}
+            {...day}
+            {...actions}
+            isSelected={day.date === selectedDate}
+          />
         ))}
       </div>
     </DragDropContext>

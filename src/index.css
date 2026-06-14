@@ -4,13 +4,41 @@
 
 @layer base {
   :root {
-    --thumb-color: #bdbcbc;
-    --thumb-hover-color: #959595;
-    --track-color: rgba(255, 255, 255, 0.1);
+    /* ----- Light theme (default) ----- */
+    --bg: 233 237 242;
+    --panel: 245 247 250;
+    --card: 255 255 255;
+    --card-2: 243 246 249;
+    --line: 224 230 238;
+    --line-2: 203 213 225;
+    --content: 15 23 42;
+    --muted: 71 85 105;
+    --subtle: 84 96 112; /* WCAG AA on every surface */
+    --accent: 132 173 12; /* lime fill */
+    --accent-text: 85 112 0; /* deep lime — AA as text on light surfaces */
+    --accent-fg: 12 16 10;
+    --shadow: 30 41 59;
 
-    --app-padding: 60px;
-    --app-padding-phone: 16px;
+    --app-padding: 28px;
+    --app-padding-phone: 14px;
     --app-height: 100vh;
+  }
+
+  .dark {
+    /* ----- Dark theme (athletic dark-tech) ----- */
+    --bg: 10 14 19;
+    --panel: 17 23 33;
+    --card: 22 29 40;
+    --card-2: 27 35 49;
+    --line: 35 44 58;
+    --line-2: 46 57 73;
+    --content: 236 241 247;
+    --muted: 148 163 184;
+    --subtle: 120 134 153; /* WCAG AA on --bg */
+    --accent: 198 244 50; /* electric lime */
+    --accent-text: 198 244 50; /* lime reads cleanly on dark */
+    --accent-fg: 10 14 19;
+    --shadow: 0 0 0;
   }
 
   @supports (height: 100dvh) {
@@ -19,58 +47,226 @@
     }
   }
 
+  * {
+    border-color: rgb(var(--line));
+  }
+
   html {
-    /* Better Font Rendering */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
-    -moz-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
 
   body {
     overflow-x: hidden;
+    color: rgb(var(--content));
+    font-feature-settings: 'tnum' 1;
+    transition:
+      background-color 0.4s ease,
+      color 0.4s ease;
+
+    /* Base canvas: one warm key light from top-right, a cool fill from
+       bottom-left. Soft and directional — reads as a lit room, not a gradient. */
+    background-color: rgb(var(--bg));
+    background-image:
+      radial-gradient(
+        70rem 55rem at 92% -12%,
+        rgb(var(--accent) / 0.12),
+        transparent 58%
+      ),
+      radial-gradient(
+        55rem 55rem at -12% 112%,
+        rgb(var(--accent) / 0.05),
+        transparent 55%
+      );
+    background-attachment: fixed;
   }
 
-  @supports (-moz-appearance: none) {
-    body {
-      scrollbar-color: var(--thumb-color) var(--track-color);
-    }
+  /* Fine dot grid that dissolves toward the edges — composed, not tiled. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgb(var(--content) / 0.05) 1px,
+      transparent 0
+    );
+    background-size: 26px 26px;
+    -webkit-mask-image: radial-gradient(
+      130% 100% at 88% 0%,
+      #000 0%,
+      transparent 72%
+    );
+    mask-image: radial-gradient(130% 100% at 88% 0%, #000 0%, transparent 72%);
+  }
+
+  /* Film grain — the tactile, "expensive" layer. Barely there. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .dark body::after {
+    opacity: 0.05;
+  }
+
+  /* Themed scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line-2)) transparent;
   }
 
   ::-webkit-scrollbar {
-    background-color: var(--track-color);
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: var(--thumb-color);
-    border: 2px solid var(--track-color);
+    border-radius: 999px;
+    background-color: rgb(var(--line-2));
   }
 
-  ::-webkit-scrollbar-thumb:hover,
-  ::-webkit-scrollbar-thumb:active {
-    background-color: var(--thumb-hover-color);
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--subtle));
   }
 
   ::-webkit-scrollbar-corner {
-    background-color: var(--track-color);
+    background-color: transparent;
   }
 
-  ::-webkit-scrollbar-button {
-    display: none;
+  /* Visible, accent-tinted focus rings for keyboard users */
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent-text));
+    outline-offset: 2px;
+    border-radius: 6px;
   }
 }
 
 @layer utilities {
   .scrollbar-none::-webkit-scrollbar {
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
   }
 
   .scrollbar-none {
     scrollbar-width: none;
+  }
+
+  /* Frosted surface used by the app bar and modal */
+  .glass {
+    background-color: rgb(var(--panel) / 0.72);
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+  }
+
+  /* Canvas now lives on <body>; keep this as a positioning context. */
+  .app-canvas {
+    position: relative;
+  }
+
+  /* Rest-day / empty drop zone: a faint embossed well, so emptiness reads
+     as intentional negative space rather than a blank panel. */
+  .rest-zone {
+    background-image: radial-gradient(
+      80% 60% at 50% 38%,
+      rgb(var(--content) / 0.025),
+      transparent 70%
+    );
+  }
+
+  /* Staggered entrance for boards/lists */
+  .stagger > * {
+    animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .stagger > *:nth-child(1) {
+    animation-delay: 0.02s;
+  }
+  .stagger > *:nth-child(2) {
+    animation-delay: 0.06s;
+  }
+  .stagger > *:nth-child(3) {
+    animation-delay: 0.1s;
+  }
+  .stagger > *:nth-child(4) {
+    animation-delay: 0.14s;
+  }
+  .stagger > *:nth-child(5) {
+    animation-delay: 0.18s;
+  }
+  .stagger > *:nth-child(6) {
+    animation-delay: 0.22s;
+  }
+  .stagger > *:nth-child(7) {
+    animation-delay: 0.26s;
+  }
+}
+
+@layer components {
+  /* Workout card: lifts on a soft spring and casts a halo in its OWN
+     muscle-group color (--edge), so each card's hover feels bespoke. */
+  .workout-card {
+    --edge: rgb(var(--accent));
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
+    will-change: transform;
+  }
+  .workout-card:hover {
+    transform: translateY(-3px);
+    border-color: rgb(var(--line-2));
+    box-shadow:
+      0 2px 4px rgb(var(--shadow) / 0.12),
+      0 22px 46px -24px color-mix(in srgb, var(--edge) 75%, transparent);
+  }
+
+  /* The colored spine widens and ignites on hover. */
+  .workout-edge {
+    transition:
+      width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s ease;
+  }
+  .workout-card:hover .workout-edge {
+    width: 5px;
+    box-shadow: 0 0 16px -1px var(--edge);
+  }
+
+  /* Plus glyph that rotates into action on hover. */
+  .add-affordance {
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+  .add-affordance .add-glyph {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .add-affordance:hover .add-glyph {
+    transform: rotate(90deg);
+  }
+}
+
+/* Honor reduced-motion: kill non-essential motion everywhere */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
