@@ -23,7 +23,13 @@ const router = createBrowserRouter(
 
 const RouteController = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex app-min-h-screen items-center justify-center">
+          <span className="size-8 animate-spin rounded-full border-2 border-line border-t-accent" />
+        </div>
+      }
+    >
       <RouterProvider router={router} />
     </Suspense>
   );

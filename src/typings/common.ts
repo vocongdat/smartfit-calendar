@@ -12,6 +12,8 @@ export interface IExerciseList {
 export interface IWorkout {
   id: string;
   name: string;
+  /** Muscle-group tag id (see MUSCLE_GROUPS). Used for color-coding. */
+  tag?: string;
   exercises: IExerciseList[];
 }
 
@@ -24,4 +26,5 @@ export interface ICalendar {
 export interface IActionCalendar {
   onAddWorkout: (id: string) => void;
   onAddExercise: (params: { idDay: string; idWorkout: string }) => void;
+  onDeleteWorkout: (params: { idDay: string; idWorkout: string }) => void;
 }

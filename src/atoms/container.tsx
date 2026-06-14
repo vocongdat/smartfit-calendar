@@ -1,16 +1,18 @@
 import { cn } from '@/utils/className';
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 interface IProps {
   children: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }
 
-export default function Container({ children, className }: IProps) {
+export default function Container({ children, className, style }: IProps) {
   return (
     <div
+      style={style}
       className={cn(
-        'flex flex-col rounded-md border bg-white/80 text-neutral-200/15',
+        'flex flex-col rounded-xl border border-line bg-card text-content shadow-card',
         className,
       )}
     >
